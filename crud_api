@@ -1,0 +1,44 @@
+from fastapi import FastAPI
+
+# Crea una instancia de FastAPI
+app = FastAPI()
+
+# Almacenamiento de datos en memoria para libros
+books_db = {}
+
+
+@app.get("/")
+def leer_raiz():
+    return {"mensaje": "Bienvenido a la API de la Librería"}
+
+
+@app.post("/libros/")
+def crear_libro(libro: dict):
+    isbn = libro["isbn"]
+    if isbn in books_db:
+        return {"mensaje": "Ya existe un libro con el mismo ISBN"}
+    books_db[isbn] = libro
+    return {"mensaje": "Libro creado exitosamente"}
+
+
+@app.get("/libros/{isbn}")
+def leer_libro(isbn: str):
+    if isbn in books_db:
+        return books_db[isbn]
+    return {"mensaje": "Libro no encontrado"}
+
+
+@app.put("/libros/{isbn}")
+def actualizar_libro(isbn: str, libro_actualizado: dict):
+    if isbn in books_db:
+        books_db[isbn] = libro_actualizado
+        return {"mensaje": f"Libro actualizado con ISBN: {isbn}"}
+    return {"mensaje": "Libro no encontrado"}
+
+
+@app.delete("/libros/{isbn}")
+def eliminar_libro(isbn: str):
+    if isbn in books_db:
+        del books_db[isbn]
+        return {"mensaje": f"Libro eliminado con ISBN: {isbn}"}
+    return {"mensaje": "Libro no encontrado"}
